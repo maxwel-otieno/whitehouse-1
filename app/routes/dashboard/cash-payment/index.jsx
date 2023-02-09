@@ -7,7 +7,7 @@ import { getTenantByMobile } from "../../../models/tenant.server";
 import { createTenantPayment } from "../../../models/year.server";
 import { getSession, sessionStorage } from "../../../session.server";
 import { badRequest, months, trimPhone, validateAmount, validateMonth, validateName, validatePhone, validateYear } from "../../../utils";
-import { createCashTransaction, getTenantTransactions } from "../../../models/transaction.server";
+import { createTransaction, getTenantTransactions } from "../../../models/transaction.server";
 import Input from "~/components/Input";
 import Select from "~/components/Select";
 import { createArrear } from "~/models/arrear.server";
@@ -150,7 +150,7 @@ export async function action({ request }) {
         // TODO: Add year and month dropdown so that users can select the month to pay for themselves.
 
         const res = await createTenantPayment(tenantId, status);
-        const transaction = await createCashTransaction(Number(amount), 'Cash', month, year, tenantId);
+        const transaction = await createTransaction(Number(amount), 'Cash', month, year, tenantId);
         // console.log({ transaction });
         // console.log({ res });
 

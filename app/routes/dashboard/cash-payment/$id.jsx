@@ -5,7 +5,7 @@ import { getTenantById } from "../../../models/tenant.server";
 import { createTenantPayment } from "../../../models/year.server";
 import { getSession, sessionStorage } from "../../../session.server";
 import { badRequest, validateAmount } from "../../../utils";
-import { createCashTransaction } from "../../../models/transaction.server";
+import { createTransaction } from "../../../models/transaction.server";
 import Input from "~/components/Input";
 
 export async function loader({ params }) {
@@ -32,7 +32,7 @@ export async function action({ request, params }) {
     // Record amount in the database
     let status = 'paid';
     const res = await createTenantPayment(tenantId, status);
-    const transaction = await createCashTransaction(Number(amount), 'Cash', tenantId);
+    const transaction = await createTransaction(Number(amount), 'Cash', tenantId);
     const matchedTenant = await getTenantById(tenantId);
 
 

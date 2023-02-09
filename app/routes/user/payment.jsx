@@ -12,7 +12,7 @@ import { getSession, getUser, sessionStorage } from "../../session.server";
 import { badRequest, validateAmount, validateMPESACode, validatePhone } from "../../utils";
 import { useEventSource } from "~/hooks/useEventSource";
 
-import { createCashTransaction } from "../../models/transaction.server";
+import { createTransaction } from "../../models/transaction.server";
 
 export function links() {
     return [
@@ -148,14 +148,18 @@ export async function action({ request }) {
 
     // const res = await createTenantPayment(tenantId, amount);
     // console.log({ res });
-    session.flash("success", true);
-    
-    const res = await createTenantPayment(tenantId, amount);
-    const transaction = await createCashTransaction(Number(amount), 'M-PESA', tenantId);
+
+    const paidMonth = new Intl.DateTimeFormat("en-US", { month: 'long' }).format(new Date());
+    const paidYear = new Date().getFullYear();
+
+    // const res = await createTenantPayment(tenantId, amount);
+    const transaction = await createTransaction(Number(amount), 'M-PESA', paidMonth, String(paidYear), tenantId);
     // console.log({ transaction });
     // console.log({ res });
 
     logPaymentDetails(userEmail, amount, 'MPESA', MPESACode);
+
+    session.flash("success", true);
 
     return redirect('/user', {
         headers: {
@@ -248,11 +252,11 @@ export default function Payment() {
                         name="MPESACode"
                         id="MPESACode"
                         placeholder="E.g. QUA12LI23S"
-                        fieldError={actionData?.fieldErrors.MPESACode }
+                        fieldError={actionData?.fieldErrors.MPESACode}
                     />
                     {/* <div> */}
-                        {/* <label htmlFor="phone" className="uppercase text-gray-500 pb-2">Enter MPESA phone number</label> */}
-                        {/* <Label htmlFor='phone' text='Enter MPESA phone number' />
+                    {/* <label htmlFor="phone" className="uppercase text-gray-500 pb-2">Enter MPESA phone number</label> */}
+                    {/* <Label htmlFor='phone' text='Enter MPESA phone number' />
                         <Input
                             ref={phoneRef}
                             type="text"
@@ -263,8 +267,8 @@ export default function Payment() {
                         />
                     </div>
                     <div> */}
-                        {/* <label htmlFor="amount" className="uppercase text-gray-600 pb-2">Enter amount</label> */}
-                        <div className="pt-3"><Label htmlFor='amount' className="pt-3" text='Confirm the Amount Paid' />
+                    {/* <label htmlFor="amount" className="uppercase text-gray-600 pb-2">Enter amount</label> */}
+                    <div className="pt-3"><Label htmlFor='amount' className="pt-3" text='Confirm the Amount Paid' />
                         <Input
                             ref={amountRef}
                             type="number"
