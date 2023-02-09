@@ -5,7 +5,7 @@ import { useOptionalUser } from "~/utils";
 export function meta() {
   return {
     title: 'White House Court',
-    description: 'Log in to White House Court or register as a tenant of Whiet House Court'
+    description: 'Log in to White House Court or register as a tenant of White House Court'
   };
 }
 
