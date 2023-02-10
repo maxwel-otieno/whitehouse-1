@@ -7,6 +7,7 @@ import { getTenantById } from "../../../models/tenant.server";
 import Heading from "../../../components/Heading";
 import { getSession } from "~/session.server";
 import { redirect } from "@remix-run/server-runtime";
+import { months } from "~/utils";
 
 export async function loader({ params }) {
     const tenantId = params.id;
@@ -51,7 +52,7 @@ export function meta({ data }) {
     };
 }
 
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
 
 export default function House() {
     const actionData = useActionData();

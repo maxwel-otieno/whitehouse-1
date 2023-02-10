@@ -3,6 +3,7 @@ import { Form, Link, useActionData, useCatch, useLoaderData, useSubmit } from "@
 import { useEffect, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import toastStyles from "react-toastify/dist/ReactToastify.css";
+import { months } from "~/utils";
 import TableHeader from "../../components/TableHeader";
 import TableRow from "../../components/TableRow";
 import { getHouse } from "../../models/house.server";
@@ -21,9 +22,9 @@ export function links() {
 export async function loader({ request }) {
     const user = await requireUser(request);
     // console.log({ user });
-    if (!user) {
-        return redirect('/login');
-    }
+    // if (!user) {
+    //     return redirect('/login');
+    // }
     const session = await getSession(request);
     const successStatus = session.get('success');
     // console.log({ successStatus });
@@ -70,14 +71,16 @@ export async function action({ request, params }) {
 export default function UserIndex() {
     const actionData = useActionData();
     const data = useLoaderData();
+    console.log({ data });
+
     // const transition = useTransition();
     const toastId = useRef(null);
     // const formRef = useRef(null);
 
     // console.log('House: ', data);
-    const months = Object.entries(data.tenant.years).slice(2, 14);
-    console.log({ months });
-    console.log(typeof (data.tenant.years))
+    // const months = Object.entries(data.tenant.years).slice(2, 14);
+    // console.log({ months });
+    // console.log(typeof (data.tenant.years))
 
     // commented out fro now
     // const years = data.tenant.years.map(year => {
@@ -113,6 +116,50 @@ export default function UserIndex() {
         });
     }
 
+    const arrears = data.tenant.arrears;
+    const paidMonths = data.tenant.transactions.map(transaction => transaction.paidMonth);
+
+    function getPaidStatus(month) {
+        // Extract months from the tenantTransactions in to an array ✅
+        // Extract amounts from the tenantTransactions for the current month in to an array ✅
+        // Check if the current month in the months array is present in the transactions table ✅
+        // If it's present, get it's transactions ✅
+        // Add all amounts of the selected month
+        // If the total amount >= 200 return 'paid' ✅
+        // If the total amount > 0 and < 200 return 'partial' ✅
+        // Check arrears for each month from db
+        // If there's an arrear return 'arrear'
+
+        const currentMonthPaidAmounts = data.tenant.transactions.filter(element => element.paidMonth === month).map(transaction => transaction.amount);
+
+        console.log({ currentMonthPaidAmounts });
+
+        let totalAmount;
+        if (currentMonthPaidAmounts.length > 0) {
+            totalAmount = currentMonthPaidAmounts.reduce((prev, current) => prev + current);
+        }
+
+        const currentMonthArrears = arrears.filter(element => element.month === month);
+
+        console.log({ currentMonthArrears });
+
+        const monthIndex = paidMonths.findIndex(paidMonth => paidMonth === month);
+        if (monthIndex !== -1) {
+            // const paidAmount = paidAmounts[monthIndex];
+            if (totalAmount >= 200) {
+                return 'paid';
+            } else if (totalAmount > 0 && totalAmount < 200) {
+                return 'partial';
+            }
+        }
+        if (currentMonthArrears.length !== 0) {
+            if (currentMonthArrears[0].amount === 200) {
+                return 'arrear';
+            }
+        }
+        // TODO: Get arrears
+        return 'not paid';
+    }
     // useEffect(() => {
     //     formRef.current?.reset();
     // }, [transition.submission]);
@@ -172,6 +219,30 @@ export default function UserIndex() {
                     <div className="grid grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
                         {actionData
                             ? actionData?.map((month, index) => (
+                                <div key={index} className={`border border-slate-100 grid place-items-center text-xs md:text-sm lg:text-base h-12 px-1 ${getPaidStatus(month) === 'paid'
+                                    ? 'bg-green-500 text-white'
+                                    : getPaidStatus(month) === 'partial'
+                                        ? 'bg-orange-300'
+                                        : getPaidStatus(month) === 'arrear'
+                                            ? 'bg-red-500 text-white'
+                                            : 'bg-gray-100'} `}>
+                                    {month}
+                                </div>
+                            ))
+                            :
+                            months.map((month, index) => (
+                                <div key={index} className={`border border-slate-100 grid place-items-center text-xs md:text-sm lg:text-base h-12 px-1 ${getPaidStatus(month) === 'paid'
+                                    ? 'bg-green-500 text-white'
+                                    : getPaidStatus(month) === 'partial'
+                                        ? 'bg-orange-300'
+                                        : getPaidStatus(month) === 'arrear'
+                                            ? 'bg-red-500 text-white'
+                                            : 'bg-gray-100'} `}>
+                                    {month}
+                                </div>
+                            ))}
+                        {/* {actionData 
+                            ? actionData?.map((month, index) => (
                                 <div key={index} className={`border border-slate-100 grid place-items-center h-12 ${month[1] !== null ? 'bg-green-500 text-white' : month[1] === 'not paid' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}>
                                     {month[0].charAt(0).toUpperCase() + month[0].slice(1)}
                                 </div>
@@ -190,7 +261,7 @@ export default function UserIndex() {
                                 }>
                                     {month[0].charAt(0).toUpperCase() + month[0].slice(1)}
                                 </div>
-                            ))}
+                            ))} */}
                     </div>
                     <p className="text-gray-500 italic text-sm">
                         Excess payments will be used to clear arrears.The earliest arrears will be cleared first.
@@ -272,7 +343,7 @@ export function CatchBoundary() {
 export function ErrorBoundary() {
     return (
         <div>
-            Oops!! Can't find your details!
+            Oops!! An error occurred
         </div>
     )
 }
