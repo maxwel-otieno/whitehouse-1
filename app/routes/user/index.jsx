@@ -65,6 +65,7 @@ export async function action({ request, params }) {
     // const months = Object.entries(matchedYear).slice(2, 14);
     // console.log('Months from action: ', months);
     // return months;
+    //redeploying the app
 }
 
 export default function UserIndex() {
