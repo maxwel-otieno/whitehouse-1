@@ -12,7 +12,7 @@ export async function getTenantTransactions(tenantId) {
     });
 }
 
-export async function createCashTransaction(amount, type, paidMonth, paidYear, tenantId) {
+export async function createTransaction(amount, type, paidMonth, paidYear, tenantId) {
     return prisma.transaction.create({
         data: {
             amount,

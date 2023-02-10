@@ -78,7 +78,7 @@ export default function UserIndex() {
     // console.log('House: ', data);
     const months = Object.entries(data.tenant.years).slice(2, 14);
     console.log({ months });
-    console.log(typeof(data.tenant.years))
+    console.log(typeof (data.tenant.years))
 
     // commented out fro now
     // const years = data.tenant.years.map(year => {
@@ -90,11 +90,14 @@ export default function UserIndex() {
     // console.log({ years });
 
     const transactions = data.tenant.transactions.map((transaction) => {
-        return Object.values(transaction).slice(1, 4);
+        return Object.values(transaction).slice(1, 7);
     });
-    transactions.forEach((transaction, index) => transaction.splice(0, 0, index + 1));
-    transactions.forEach((transaction) => transaction.splice(3, 1, new Date(transaction[3]).toDateString()));
+
     // console.log({ transactions });
+
+    transactions.forEach((transaction, index) => transaction.splice(0, 0, index + 1));
+    transactions.forEach((transaction) => transaction.splice(3, 4, new Date(transaction[6]).toDateString()));
+    console.log({ transactions });
 
     const submit = useSubmit();
     function handleYearChange(event) {
@@ -164,6 +167,7 @@ export default function UserIndex() {
                                     ))} */}
                                         <option value="2023">2023</option>
                                         <option value="2022">2022</option>
+                                    <option value="2022">2022</option>
                                 </select>
                             </Form>
                         </div>
